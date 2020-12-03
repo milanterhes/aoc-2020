@@ -88,3 +88,22 @@ pub fn day2_2() -> i32 {
   }
   valid_counter
 }
+
+pub fn day3_1() -> i32 {
+  let input = read_into_vec(String::from("src/inputs/3.txt"));
+
+  calculate_slope(&input, 3, 1)
+}
+
+pub fn day3_2() -> u128 {
+  let input = read_into_vec(String::from("src/inputs/3.txt"));
+
+  let slopes = vec![(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
+
+  let solutions = slopes
+    .iter()
+    .map(|&slope| calculate_slope(&input, slope.0, slope.1))
+    .collect::<Vec<i32>>();
+
+  solutions.iter().fold(1 as u128, |acc, x| acc * *x as u128)
+}
