@@ -9,4 +9,6 @@ fn main() {
     println!("day2_2 {}", solutions::day2_2());
     println!("day3_1 {}", solutions::day3_1());
     println!("day3_2 {}", solutions::day3_2());
+    println!("day4_1 {:?}", solutions::day4_1());
+    println!("day4_2 {:?}", solutions::day4_2());
 }

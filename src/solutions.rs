@@ -107,3 +107,29 @@ pub fn day3_2() -> u128 {
 
   solutions.iter().fold(1 as u128, |acc, x| acc * *x as u128)
 }
+
+pub fn day4_1() -> i32 {
+  let input = read_into_vec(String::from("src/inputs/4.txt"));
+  let passports = parse_passports(input);
+  let mut counter = 0;
+  for p in passports {
+    let has_cid = p.iter().any(|pair| pair.0 == "cid");
+    if has_cid && p.len() == 8 {
+      counter = counter + 1;
+    } else if !has_cid && p.len() == 7 {
+      counter = counter + 1;
+    }
+  }
+  counter
+}
+
+pub fn day4_2() -> i32 {
+  let input = read_into_vec(String::from("src/inputs/4.txt"));
+  let passports = parse_passports(input);
+  passports.iter().fold(0, |acc, p| {
+    if validate_passport(p) {
+      return acc + 1;
+    }
+    acc
+  })
+}

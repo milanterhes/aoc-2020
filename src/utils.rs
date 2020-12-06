@@ -1,3 +1,4 @@
+use regex::Regex;
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
@@ -62,4 +63,126 @@ pub fn calculate_slope(input: &Vec<std::string::String>, right: i32, down: i32) 
     pos = step(&pos, biome_width, right, down);
   }
   counter
+}
+
+pub fn parse_passports(input: Vec<String>) -> Vec<Vec<(String, String)>> {
+  let mut passport_strings: Vec<String> = vec![];
+
+  let mut string_holder: String = "".to_string();
+
+  for line in input {
+    if line.is_empty() {
+      passport_strings.push(string_holder.to_string());
+      string_holder = "".to_string();
+    } else {
+      if string_holder == "" {
+        string_holder = line;
+      } else {
+        string_holder = format!("{} {}", string_holder, line);
+      }
+    }
+  }
+
+  let mut passports: Vec<Vec<(String, String)>> = vec![];
+
+  for line in passport_strings {
+    let fields: Vec<String> = line.split(" ").map(|f| f.to_string()).collect();
+    let pairs = fields
+      .iter()
+      .map(|f| {
+        let sp = f.split(":").collect::<Vec<&str>>();
+        (sp[0].to_string(), sp[1].to_string())
+      })
+      .collect();
+    passports.push(pairs);
+  }
+
+  passports
+}
+
+pub fn validate_passport(passport: &Vec<(String, String)>) -> bool {
+  let mut valid = true;
+
+  let mut has_cid = false;
+
+  for field in passport {
+    match field.0.as_str() {
+      "byr" => {
+        let as_num = field.1.parse::<i32>().unwrap();
+        if !(field.1.len() == 4 && as_num >= 1920 && as_num <= 2002) {
+          valid = false;
+          break;
+        }
+      }
+      "iyr" => {
+        let as_num = field.1.parse::<i32>().unwrap();
+        if !(field.1.len() == 4 && as_num >= 2010 && as_num <= 2020) {
+          valid = false;
+          break;
+        }
+      }
+      "eyr" => {
+        let as_num = field.1.parse::<i32>().unwrap();
+        if !(field.1.len() == 4 && as_num >= 2020 && as_num <= 2030) {
+          valid = false;
+          break;
+        }
+      }
+      "hgt" => {
+        let (value, unit) = field.1.split_at(field.1.len() - 2);
+        match unit {
+          "cm" => {
+            let as_num = value.parse::<i32>().unwrap();
+            if !(as_num <= 193 && as_num >= 150) {
+              valid = false;
+              break;
+            }
+          }
+          "in" => {
+            let as_num = value.parse::<i32>().unwrap();
+            if !(as_num <= 76 && as_num >= 59) {
+              valid = false;
+              break;
+            }
+          }
+          _ => {
+            valid = false;
+            break;
+          }
+        }
+      }
+      "hcl" => {
+        let re = Regex::new(r"#[0-9a-f]").unwrap();
+        if !re.is_match(&field.1) && field.1.len() != 7 {
+          valid = false;
+          break;
+        }
+      }
+      "ecl" => {
+        if !(vec!["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
+          .iter()
+          .any(|x| x == &field.1))
+        {
+          valid = false;
+          break;
+        }
+      }
+      "pid" => {
+        if field.1.len() != 9 {
+          valid = false;
+          break;
+        }
+      }
+      "cid" => {
+        has_cid = true;
+      }
+      _ => (),
+    }
+  }
+
+  if !(has_cid && passport.len() == 8 || !has_cid && passport.len() == 7) {
+    return false;
+  }
+
+  valid
 }
