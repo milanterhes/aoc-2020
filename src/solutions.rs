@@ -133,3 +133,55 @@ pub fn day4_2() -> i32 {
     acc
   })
 }
+
+pub fn day5_1() -> i32 {
+  let input = read_into_vec(String::from("src/inputs/5.txt"));
+  let mut highest_id = 0;
+
+  for line in input {
+    let (row, column) = line.split_at(line.len() - 3);
+    let row_sol = find_number(row, true);
+    let column_sol = find_number(column, false);
+
+    let seat_id = row_sol * 8 + column_sol;
+    if seat_id > highest_id {
+      highest_id = seat_id;
+    }
+  }
+
+  highest_id
+}
+
+pub fn day5_2() -> i32 {
+  let input = read_into_vec(String::from("src/inputs/5.txt"));
+  let mut id_list: Vec<i32> = vec![];
+
+  for line in input {
+    let (row, column) = line.split_at(line.len() - 3);
+    let row_sol = find_number(row, true);
+    let column_sol = find_number(column, false);
+
+    let seat_id = row_sol * 8 + column_sol;
+
+    id_list.push(seat_id);
+  }
+
+  id_list.sort();
+
+  for i in 0..id_list.len() {
+    let above_id = ((0 + id_list.len() - 1) / 2) + i;
+    let below_id = ((0 + id_list.len() - 1) / 2) - i;
+    if (above_id as i32) < id_list.len() as i32 - 2 {
+      if (id_list[above_id - 1] - id_list[above_id + 1]).abs() != 2 {
+        return id_list[above_id] + 1;
+      }
+    }
+
+    if (below_id as i32) > 1 {
+      if (id_list[below_id - 1] - id_list[below_id + 1]).abs() != 2 {
+        return id_list[below_id] - 1;
+      }
+    }
+  }
+  panic!("Cannot find your seat id")
+}

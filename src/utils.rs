@@ -186,3 +186,20 @@ pub fn validate_passport(passport: &Vec<(String, String)>) -> bool {
 
   valid
 }
+
+pub fn find_number(input: &str, is_row: bool) -> i32 {
+  let mut current_pair: (i32, i32) = if is_row { (0, 127) } else { (0, 7) };
+
+  for character in input.split("").collect::<Vec<&str>>() {
+    if current_pair.0 == current_pair.1 {
+      return current_pair.1;
+    }
+    if character == "F" || character == "L" {
+      current_pair.1 = (current_pair.0 + current_pair.1) / 2;
+    } else if character == "B" || character == "R" {
+      current_pair.0 = ((current_pair.0 as f32 + current_pair.1 as f32) / 2 as f32).ceil() as i32;
+    }
+  }
+
+  panic!("Cannot parse seat data {}", input)
+}
